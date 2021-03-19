@@ -1,0 +1,21 @@
+{
+	"name": "adt/api-json-router",
+	"description": "RESTful Router for Nette with Json schema specification and verification",
+	"type": "library",
+	"license": "MIT",
+	"authors": [
+		{
+			"name": "AppsDevTeam",
+			"email": "hello@appsdevteam.com"
+		}
+	],
+	"autoload": {
+		"psr-4": {
+			"ADT\\ApiJsonRouter\\": "src/"
+		}
+	},
+	"require": {
+		"php": ">= 7.1.0",
+		"contributte/api-router": "^4.0"
+	}
+}
