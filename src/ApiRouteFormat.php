@@ -185,4 +185,18 @@ class ApiRouteFormat extends ApiRoute
 		}
 		return $result;
 	}
+
+
+	public static function addRoutesBySpecification(\Nette\Application\Routers\RouteList $routerApi, array $apiRouteSpecification) {
+		foreach ($apiRouteSpecification as $key => $route) {
+			$routerApi[] = new ApiRouteFormat($route['path'], $route['presenter'], $route['body'], [
+				'methods' => isset($route['action'])
+					? [ $route['method'] => $route['action'] ]
+					: [ $route['method'] ]
+			]);
+		}
+
+		return $routerApi;
+	}
+
 }
