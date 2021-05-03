@@ -192,7 +192,8 @@ class ApiRouteFormat extends ApiRoute
 			$routerApi[] = new ApiRouteFormat($route['path'], $route['presenter'], $route['body'], [
 				'methods' => isset($route['action'])
 					? [ $route['method'] => $route['action'] ]
-					: [ $route['method'] ]
+					: [ $route['method'] ],
+				'parameters' => isset($route['parameters']) ? $route['parameters'] : [],
 			]);
 		}
 
