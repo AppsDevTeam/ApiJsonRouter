@@ -24,6 +24,8 @@ class ApiRouteFormat extends ApiRoute
 	public static $errorPresenter = 'Error';
 	/** @var string */
 	public static $errorAction = 'error';
+	/** @var bool */
+	public static $throwErrors = FALSE;
 
 	/**
 	 * @param string $errorPresenter
@@ -37,6 +39,15 @@ class ApiRouteFormat extends ApiRoute
 	 */
 	public static function setErrorAction(string $errorAction): void {
 		self::$errorAction = $errorAction;
+	}
+
+	/**
+	 * If FALSE, errors will be redirected into self::$errorPresenter, if TRUE, errors will be thrown by the route
+	 * Defaults to FALSE
+	 * @param bool $throwErrors
+	 */
+	public static function setThrowErrors(bool $throwErrors): void {
+		self::$throwErrors = $throwErrors;
 	}
 
 	/**
@@ -175,13 +186,17 @@ class ApiRouteFormat extends ApiRoute
 				}
 			}
 		} catch (FormatSchemaError | FormatInputError $e) {
-			return [
-				'presenter' => self::$errorPresenter,
-				'action' => self::$errorAction,
-				'secured' => FALSE,
-				'error' => $e::ERROR_MESSAGE,
-				'code' => $e::ERROR_CODE,
-			];
+			if (self::$throwErrors) {
+				throw $e;
+			} else {
+				return [
+					'presenter' => self::$errorPresenter,
+					'action' => self::$errorAction,
+					'secured' => FALSE,
+					'error' => $e::ERROR_MESSAGE,
+					'code' => $e::ERROR_CODE,
+				];
+			}
 		}
 		return $result;
 	}

@@ -26,8 +26,14 @@ $apiModule[] = new ApiRouteFormat('/api/item', 'Item', [
 ### With generating documentation
 
 ```php
+// Configure to redirect errors into error presenter
 \ADT\ApiJsonRouter\ApiRouteFormat::setErrorPresenter('Error');
 \ADT\ApiJsonRouter\ApiRouteFormat::setErrorAction('handleError');
+\ADT\ApiJsonRouter\ApiRouteFormat::setThrowErrors(FALSE);
+$apiModule = new RouteList('Api');
+
+// Or to throw \ADT\ApiJsonRouter\FormatSchemaError or \ADT\ApiJsonRouter\FormatInputError
+\ADT\ApiJsonRouter\ApiRouteFormat::setThrowErrors(TRUE);
 $apiModule = new RouteList('Api');
 
 \ADT\ApiJsonRouter\ApiRouteFormat::addRoutesBySpecification($apiModule, getApiRouteSpecification());
