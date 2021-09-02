@@ -78,20 +78,20 @@ class ApiRouteFormat extends ApiRoute
 		}
 	}
 
-	protected function verifyBodyType($body, $types): int {
+	protected function verifyBodyType($body, $types, $propertyPath): int {
 		if (!is_array($types)) {
 			$types = [$types];
 		}
 		$bodyType = $this->verifyTypeof($body);
 		foreach ($types as $type) {
 			if (!is_string($type)) {
-				throw new FormatSchemaError('Property type must be an array of strings or string');
+				throw new FormatSchemaError("Property type must be an array of strings or string @$propertyPath");
 			} else if ($type === $bodyType) {
 				return TRUE;
 			}
 		}
 		// No type for which input would be valid found
-		throw new FormatInputError('Invalid type on input');
+		throw new FormatInputError("Invalid type '$bodyType' @$propertyPath");
 	}
 
 	/**
@@ -100,17 +100,17 @@ class ApiRouteFormat extends ApiRoute
 	 * @throws FormatInputError
 	 * @throws FormatSchemaError
 	 */
-	protected function verifyBodyFormat($body, $schema) {
+	protected function verifyBodyFormat($body, $schema, $propertyPath = 'body') {
 		if (!is_array($schema)) {
-			throw new FormatSchemaError('Property definition must be an associative array');
+			throw new FormatSchemaError("Property definition must be an associative array @$propertyPath");
 		}
 		if (isset($schema['type'])) {
-			$this->verifyBodyType($body, $schema['type']);
+			$this->verifyBodyType($body, $schema['type'], $propertyPath);
 		}
 		$type = $this->verifyTypeof($body);
 		if (isset($schema['enum'])) {
 			if (!is_array($schema['enum'])) {
-				throw new FormatSchemaError('Enum must be array');
+				throw new FormatSchemaError("Enum must be array @$propertyPath");
 			}
 			$match = FALSE;
 			foreach ($schema['enum'] as $enum) {
@@ -120,32 +120,32 @@ class ApiRouteFormat extends ApiRoute
 				}
 			}
 			if (!$match) {
-				throw new FormatSchemaError('Property value doesn\'t match any value in enum');
+				throw new FormatInputError("Property value doesn't match any value in enum @$propertyPath");
 			}
 		}
 		if ($type === 'object') {
 			// Check that object contains all required
 			if (isset($schema['required'])) {
 				if (!is_array($schema['required'])) {
-					throw new FormatSchemaError('Required properties must be array');
+					throw new FormatSchemaError("Required properties must be array @$propertyPath");
 				}
 				foreach ($schema['required'] as $required) {
 					if (!is_string($required)) {
-						throw new FormatSchemaError('Property name must be string');
+						throw new FormatSchemaError("Property name must be string @$propertyPath");
 					} else if (!isset($body->$required)) {
-						throw new FormatInputError('Missing a required property');
+						throw new FormatInputError("Missing required property '$required' @$propertyPath");
 					}
 				}
 			}
 			// Check that all elements match the schema
 			foreach ($body as $key => $value) {
 				if (isset($schema['properties'][$key])) {
-					$this->verifyBodyFormat($value, $schema['properties'][$key]);
+					$this->verifyBodyFormat($value, $schema['properties'][$key], "$propertyPath:$key");
 				} else if (isset($schema['additionalProperties'])) {
 					if ($schema['additionalProperties'] === FALSE) {
-						throw new FormatInputError('Additional properties not allowed');
+						throw new FormatInputError("Additional properties not allowed @$propertyPath");
 					}
-					$this->verifyBodyFormat($value, $schema['additionalProperties']);
+					$this->verifyBodyFormat($value, $schema['additionalProperties'], "$propertyPath:$key");
 				}
 			}
 		}
@@ -153,7 +153,7 @@ class ApiRouteFormat extends ApiRoute
 		else if ($type === 'array') {
 			foreach ($body as $key => $value) {
 				if (isset($schema['items'])) {
-					$this->verifyBodyFormat($value, $schema->items);
+					$this->verifyBodyFormat($value, $schema['items'], "{$propertyPath}[{$key}]");
 				}
 			}
 		}
@@ -195,6 +195,7 @@ class ApiRouteFormat extends ApiRoute
 					'secured' => FALSE,
 					'error' => $e::ERROR_MESSAGE,
 					'code' => $e::ERROR_CODE,
+					'message' => $e->getMessage(),
 				];
 			}
 		}

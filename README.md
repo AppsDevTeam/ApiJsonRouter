@@ -84,8 +84,8 @@ class ItemPresenter extends Presenter {
 ### Error presenter
 ```php
 class ErrorPresenter extends Presenter {
-    public function actionHandleError($error, int $code) {
-        $this->sendResponse(new JsonStatusResponse(['error' => $error], $code));
+    public function actionHandleError($error, int $code, $message) {
+        $this->sendResponse(new JsonStatusResponse(['error' => $error, 'message' => $message], $code));
     }
 }
 ```
