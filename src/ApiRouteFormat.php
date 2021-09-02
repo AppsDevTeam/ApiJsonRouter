@@ -20,6 +20,13 @@ class ApiRouteFormat extends ApiRoute
 	/** @var array|null */
 	protected $bodySchema = NULL;
 
+	public const JSON_TYPE_NUMBER = 'number';
+	public const JSON_TYPE_STRING = 'string';
+	public const JSON_TYPE_BOOLEAN = 'boolean';
+	public const JSON_TYPE_ARRAY = 'array';
+	public const JSON_TYPE_OBJECT = 'object';
+	public const JSON_TYPE_NULL = 'null';
+
 	/** @var string */
 	public static $errorPresenter = 'Error';
 	/** @var string */
@@ -64,17 +71,17 @@ class ApiRouteFormat extends ApiRoute
 
 	protected function verifyTypeof($body): string {
 		if (is_int($body) || is_float($body)) {
-			return 'number';
+			return self::JSON_TYPE_NUMBER;
 		} else if (is_string($body)) {
-			return 'string';
+			return self::JSON_TYPE_STRING;
 		} else if (is_bool($body)) {
-			return 'boolean';
+			return self::JSON_TYPE_BOOLEAN;
 		} else if (is_array($body)) {
-			return 'array';
+			return self::JSON_TYPE_ARRAY;
 		} else if (is_object($body)) {
-			return 'object';
+			return self::JSON_TYPE_OBJECT;
 		} else {
-			return 'null';
+			return self::JSON_TYPE_NULL;
 		}
 	}
 
