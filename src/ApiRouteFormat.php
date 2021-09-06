@@ -20,10 +20,19 @@ class ApiRouteFormat extends ApiRoute
 	/** @var array|null */
 	protected $bodySchema = NULL;
 
+	public const JSON_TYPE_NUMBER = 'number';
+	public const JSON_TYPE_STRING = 'string';
+	public const JSON_TYPE_BOOLEAN = 'boolean';
+	public const JSON_TYPE_ARRAY = 'array';
+	public const JSON_TYPE_OBJECT = 'object';
+	public const JSON_TYPE_NULL = 'null';
+
 	/** @var string */
 	public static $errorPresenter = 'Error';
 	/** @var string */
 	public static $errorAction = 'error';
+	/** @var bool */
+	public static $throwErrors = FALSE;
 
 	/**
 	 * @param string $errorPresenter
@@ -40,6 +49,15 @@ class ApiRouteFormat extends ApiRoute
 	}
 
 	/**
+	 * If FALSE, errors will be redirected into self::$errorPresenter, if TRUE, errors will be thrown by the route
+	 * Defaults to FALSE
+	 * @param bool $throwErrors
+	 */
+	public static function setThrowErrors(bool $throwErrors): void {
+		self::$throwErrors = $throwErrors;
+	}
+
+	/**
 	 * ApiRouteFormat constructor.
 	 * @param $path Path being routed
 	 * @param string|null $presenter Presenter
@@ -53,34 +71,34 @@ class ApiRouteFormat extends ApiRoute
 
 	protected function verifyTypeof($body): string {
 		if (is_int($body) || is_float($body)) {
-			return 'number';
+			return self::JSON_TYPE_NUMBER;
 		} else if (is_string($body)) {
-			return 'string';
+			return self::JSON_TYPE_STRING;
 		} else if (is_bool($body)) {
-			return 'boolean';
+			return self::JSON_TYPE_BOOLEAN;
 		} else if (is_array($body)) {
-			return 'array';
+			return self::JSON_TYPE_ARRAY;
 		} else if (is_object($body)) {
-			return 'object';
+			return self::JSON_TYPE_OBJECT;
 		} else {
-			return 'null';
+			return self::JSON_TYPE_NULL;
 		}
 	}
 
-	protected function verifyBodyType($body, $types): int {
+	protected function verifyBodyType($body, $types, $propertyPath): int {
 		if (!is_array($types)) {
 			$types = [$types];
 		}
 		$bodyType = $this->verifyTypeof($body);
 		foreach ($types as $type) {
 			if (!is_string($type)) {
-				throw new FormatSchemaError('Property type must be an array of strings or string');
+				throw new FormatSchemaError("Property type must be an array of strings or string @$propertyPath");
 			} else if ($type === $bodyType) {
 				return TRUE;
 			}
 		}
 		// No type for which input would be valid found
-		throw new FormatInputError('Invalid type on input');
+		throw new FormatInputError("Invalid type '$bodyType' @$propertyPath");
 	}
 
 	/**
@@ -89,17 +107,17 @@ class ApiRouteFormat extends ApiRoute
 	 * @throws FormatInputError
 	 * @throws FormatSchemaError
 	 */
-	protected function verifyBodyFormat($body, $schema) {
+	protected function verifyBodyFormat($body, $schema, $propertyPath = 'body') {
 		if (!is_array($schema)) {
-			throw new FormatSchemaError('Property definition must be an associative array');
+			throw new FormatSchemaError("Property definition must be an associative array @$propertyPath");
 		}
 		if (isset($schema['type'])) {
-			$this->verifyBodyType($body, $schema['type']);
+			$this->verifyBodyType($body, $schema['type'], $propertyPath);
 		}
 		$type = $this->verifyTypeof($body);
 		if (isset($schema['enum'])) {
 			if (!is_array($schema['enum'])) {
-				throw new FormatSchemaError('Enum must be array');
+				throw new FormatSchemaError("Enum must be array @$propertyPath");
 			}
 			$match = FALSE;
 			foreach ($schema['enum'] as $enum) {
@@ -109,32 +127,32 @@ class ApiRouteFormat extends ApiRoute
 				}
 			}
 			if (!$match) {
-				throw new FormatSchemaError('Property value doesn\'t match any value in enum');
+				throw new FormatInputError("Property value doesn't match any value in enum @$propertyPath");
 			}
 		}
 		if ($type === 'object') {
 			// Check that object contains all required
 			if (isset($schema['required'])) {
 				if (!is_array($schema['required'])) {
-					throw new FormatSchemaError('Required properties must be array');
+					throw new FormatSchemaError("Required properties must be array @$propertyPath");
 				}
 				foreach ($schema['required'] as $required) {
 					if (!is_string($required)) {
-						throw new FormatSchemaError('Property name must be string');
+						throw new FormatSchemaError("Property name must be string @$propertyPath");
 					} else if (!isset($body->$required)) {
-						throw new FormatInputError('Missing a required property');
+						throw new FormatInputError("Missing required property '$required' @$propertyPath");
 					}
 				}
 			}
 			// Check that all elements match the schema
 			foreach ($body as $key => $value) {
 				if (isset($schema['properties'][$key])) {
-					$this->verifyBodyFormat($value, $schema['properties'][$key]);
+					$this->verifyBodyFormat($value, $schema['properties'][$key], "$propertyPath:$key");
 				} else if (isset($schema['additionalProperties'])) {
 					if ($schema['additionalProperties'] === FALSE) {
-						throw new FormatInputError('Additional properties not allowed');
+						throw new FormatInputError("Additional properties not allowed @$propertyPath");
 					}
-					$this->verifyBodyFormat($value, $schema['additionalProperties']);
+					$this->verifyBodyFormat($value, $schema['additionalProperties'], "$propertyPath:$key");
 				}
 			}
 		}
@@ -142,7 +160,7 @@ class ApiRouteFormat extends ApiRoute
 		else if ($type === 'array') {
 			foreach ($body as $key => $value) {
 				if (isset($schema['items'])) {
-					$this->verifyBodyFormat($value, $schema->items);
+					$this->verifyBodyFormat($value, $schema['items'], "{$propertyPath}[{$key}]");
 				}
 			}
 		}
@@ -175,13 +193,18 @@ class ApiRouteFormat extends ApiRoute
 				}
 			}
 		} catch (FormatSchemaError | FormatInputError $e) {
-			return [
-				'presenter' => self::$errorPresenter,
-				'action' => self::$errorAction,
-				'secured' => FALSE,
-				'error' => $e::ERROR_MESSAGE,
-				'code' => $e::ERROR_CODE,
-			];
+			if (self::$throwErrors) {
+				throw $e;
+			} else {
+				return [
+					'presenter' => self::$errorPresenter,
+					'action' => self::$errorAction,
+					'secured' => FALSE,
+					'error' => $e::ERROR_MESSAGE,
+					'code' => $e::ERROR_CODE,
+					'message' => $e->getMessage(),
+				];
+			}
 		}
 		return $result;
 	}
