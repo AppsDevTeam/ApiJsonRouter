@@ -164,6 +164,59 @@ class ApiRouteFormat extends ApiRoute
 				}
 			}
 		}
+		// Must not meet "not" subschema
+		if (isset($schema['not'])) {
+			$passes = FALSE;
+			try {
+				$this->verifyBodyFormat($body, $schema['not'], $propertyPath);
+				// If verify doesn't throw, it passed, thus doesn't satisfy "not" subschema
+				$passes = TRUE;
+			} catch (FormatInputError $e) {
+				// We want an error to verify it doesn't meet the subschema
+			}
+			if ($passes) {
+				throw new FormatInputError("Must not meet 'not' subschema @$propertyPath");
+			}
+		}
+		// Simply must verify against all subschemas
+		if (isset($schema['allOf'])) {
+			foreach ($schema['allOf'] as $id => $subschema) {
+				$this->verifyBodyFormat($body, $subschema, $propertyPath);
+			}
+		}
+		// Must verify against at least one subschema
+		if (isset($schema['anyOf'])) {
+			$verified = FALSE;
+			foreach ($schema['anyOf'] as $id => $subschema) {
+				try {
+					$this->verifyBodyFormat($body, $subschema, $propertyPath);
+					$verified = TRUE;
+					break;
+				} catch (FormatInputError $e) {
+					// Some other subschema could meet instead
+				}
+			}
+			if (!$verified) {
+				throw new FormatInputError("Must meet at least one 'anyOf' subschema @$propertyPath");
+			}
+		}
+		// Must verify against exactly one subschema
+		if (isset($schema['oneOf'])) {
+			$verified = 0;
+			foreach ($schema['oneOf'] as $id => $subschema) {
+				try {
+					$this->verifyBodyFormat($body, $subschema, $propertyPath);
+					$verified++;
+				} catch (FormatInputError $e) {
+					// We want most to not meet
+				}
+			}
+			if ($verified === 0) {
+				throw new FormatInputError("Must meet exactly one 'oneOf' subschema (didn't meet any) @$propertyPath");
+			} else if ($verified >= 2) {
+				throw new FormatInputError("Must meet exactly one 'oneOf' subschema (met more than one) @$propertyPath");
+			}
+		}
 	}
 
 	public function match(Nette\Http\IRequest $httpRequest): ?array {
