@@ -158,10 +158,22 @@ class ApiRouteFormat extends ApiRoute
 		}
 		// Check elements of an array
 		else if ($type === 'array') {
+			$matches = 0;
 			foreach ($body as $key => $value) {
 				if (isset($schema['items'])) {
 					$this->verifyBodyFormat($value, $schema['items'], "{$propertyPath}[{$key}]");
 				}
+				if (isset($schema['contains'])) {
+					try {
+						$this->verifyBodyFormat($value, $schema['contains'], "{$propertyPath}[{$key}]");
+						$matches++;
+					} catch (FormatInputError $e) {
+						// Not all need to match this
+					}
+				}
+			}
+			if (isset($schema['contains']) && $matches === 0) {
+				throw new FormatInputError("At least one element must meet 'contains' subschema @$propertyPath");
 			}
 		}
 		// Must not meet "not" subschema
