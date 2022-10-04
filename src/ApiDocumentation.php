@@ -45,9 +45,19 @@ class ApiDocumentation {
 		$this->documentation .= $call['description'] . "\n\n";
 		$this->documentation .= "**URL**: `" . $call['path'] . "`\n\n";
 		$this->documentation .= "**Method**: " . $call['method'];
+
+		if (isset($call['query'])) {
+			$this->documentation .= "\n\n**Query**:\n\n```json\n" . json_encode($call['query'], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n```";
+		}
+
 		if ($call['body'] !== NULL) {
 			$this->documentation .= "\n\n**Body**:\n\n```json\n" . json_encode($call['body'], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n```";
 		}
+
+		if (isset($call['response'])) {
+			$this->documentation .= "\n\n**Response**:\n\n```json\n" . json_encode($call['response'], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n```";
+		}
+
 	}
 
 	public function createDocumentation(): void {
