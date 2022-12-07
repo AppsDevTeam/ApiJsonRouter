@@ -16,6 +16,6 @@
 	},
 	"require": {
 		"php": ">= 7.1.0",
-		"contributte/api-router": "^4.0"
+		"contributte/api-router": "^2.0"
 	}
 }
