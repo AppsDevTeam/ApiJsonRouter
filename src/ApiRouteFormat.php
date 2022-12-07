@@ -2,7 +2,7 @@
 
 namespace ADT\ApiJsonRouter;
 
-use Contributte\ApiRouter\ApiRoute;
+use Ublaboo\ApiRouter\ApiRoute;
 use Nette;
 
 class FormatSchemaError extends \Exception {
@@ -231,7 +231,7 @@ class ApiRouteFormat extends ApiRoute
 		}
 	}
 
-	public function match(Nette\Http\IRequest $httpRequest): ?array {
+	public function match(Nette\Http\IRequest $httpRequest): ?Nette\Application\Request {
 		$result = parent::match($httpRequest);
 
 		if ($result === NULL || $this->bodySchema === NULL) {
@@ -253,7 +253,7 @@ class ApiRouteFormat extends ApiRoute
 			if (isset($this->bodySchema['properties'])) {
 				foreach ($this->bodySchema['properties'] as $key => $value) {
 					if (isset($body->$key)) {
-						$result["_$key"] = $body->$key;
+						$result->parameters["_$key"] = $body->$key;
 					}
 				}
 			}
@@ -261,14 +261,19 @@ class ApiRouteFormat extends ApiRoute
 			if (self::$throwErrors) {
 				throw $e;
 			} else {
-				return [
-					'presenter' => self::$errorPresenter,
-					'action' => self::$errorAction,
-					'secured' => FALSE,
-					'error' => $e::ERROR_MESSAGE,
-					'code' => $e::ERROR_CODE,
-					'message' => $e->getMessage(),
-				];
+				return new Nette\Application\Request(
+					self::$errorPresenter,
+					Nette\Application\Request::FORWARD,
+					[
+						'action' => self::$errorAction,
+						'error' => $e::ERROR_MESSAGE,
+						'code' => $e::ERROR_CODE,
+						'message' => $e->getMessage(),
+					],
+					$httpRequest->getPost(),
+					$httpRequest->getFiles(),
+					[Nette\Application\Request::SECURED => $httpRequest->isSecured()]
+				);
 			}
 		}
 		return $result;
