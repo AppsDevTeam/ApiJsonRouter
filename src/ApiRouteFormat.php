@@ -251,13 +251,13 @@ class ApiRouteFormat extends ApiRoute
 			}
 			$this->verifyBodyFormat($body, $this->bodySchema);
 			if (isset($this->bodySchema['properties'])) {
-				$originalParams = $result->getParameters();
+				$parameters = $result->getParameters();
 				foreach ($this->bodySchema['properties'] as $key => $value) {
 					if (isset($body->$key)) {
-						$originalParams["_$key"] = $body->$key;
+						$parameters["_$key"] = $body->$key;
 					}
 				}
-				$result->setParameters($originalParams);
+				$result->setParameters($parameters);
 			}
 		} catch (FormatSchemaError | FormatInputError $e) {
 			if (self::$throwErrors) {
