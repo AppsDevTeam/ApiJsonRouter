@@ -10,6 +10,7 @@ class EmptyBodyTest extends BaseUnit {
 		$route = $this->getRoute(null);
 		$request = $this->getRequest(null);
 		$appRequest = $route->match($request);
+		$this->assertNotError($appRequest);
 		$this->assertJsonParametersCount(0, $appRequest);
 	}
 

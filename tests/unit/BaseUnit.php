@@ -22,6 +22,12 @@ class BaseUnit extends Unit {
 		return new Request($url, null, null, null, null, 'GET', null, null, function () use ($bodyJson) {return $bodyJson;});
 	}
 
+	protected function assertNotError($appRequest) {
+		if (isset($appRequest['error'])) {
+			$this->tester->assertArrayNotHasKey('error', $appRequest, 'JsonRouter error: ' . $appRequest['error'] . ' -> ' . $appRequest['message']);
+		}
+	}
+
 	protected function assertJsonParametersCount($expectedCount, $appRequest) {
 		$jsonBodyParamsCount = 0;
 		foreach ($appRequest as $param => $value) {

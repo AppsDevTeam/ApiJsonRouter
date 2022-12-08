@@ -25,6 +25,7 @@ class BasicTypesTest extends BaseUnit {
 		]);
 
 		$appRequest = $route->match($request);
+		$this->assertNotError($appRequest);
 
 		$this->assertJsonParametersCount(3, $appRequest);
 
