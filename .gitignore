@@ -1,2 +1,6 @@
 /vendor
 /.idea
+/.composer
+/tests/_output
+/tests/_support
+composer.lock
