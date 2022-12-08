@@ -15,7 +15,7 @@ $apiModule[] = new ApiRouteFormat('/api/item', 'Item', [
     'type' => 'object',
     'properties' => [
         'name' => ['type' => 'string'],
-        'count' => ['type' => 'int'],
+        'count' => ['type' => 'number'],
     ],
     'required' => ['name']
 ], [
@@ -50,7 +50,7 @@ function getApiRouteSpecification() {
                 'type' => 'object',
                 'properties' => [
                     'name' => ['type' => 'string'],
-                    'count' => ['type' => 'int'],
+                    'count' => ['type' => 'number'],
                 ],
                 'required' => ['name']
             ],

@@ -2,3 +2,4 @@ class_name: UnitTester
 modules:
     enabled:
         - Asserts
+bootstrap: bootstrap.php
