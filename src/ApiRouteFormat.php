@@ -130,6 +130,32 @@ class ApiRouteFormat extends ApiRoute
 				throw new FormatInputError("Property value doesn't match any value in enum @$propertyPath");
 			}
 		}
+		if ($type === self::JSON_TYPE_STRING) {
+			if (isset($schema['minLength'])) {
+				if (!is_int($schema['minLength'])) {
+					throw new FormatSchemaError("MinLength must be integer @$propertyPath");
+				}
+				if (strlen($body) < $schema['minLength']) {
+					throw new FormatInputError("Property @$propertyPath must be at least {$schema['minLength']} characters long");
+				}
+			}
+			if (isset($schema['maxLength'])) {
+				if (!is_int($schema['maxLength'])) {
+					throw new FormatSchemaError("MaxLength must be integer @$propertyPath");
+				}
+				if (strlen($body) > $schema['maxLength']) {
+					throw new FormatInputError("Property @$propertyPath can be a maximum of {$schema['maxLength']} characters long");
+				}
+			}
+			if (isset($schema['pattern'])) {
+				if (!is_string($schema['pattern'])) {
+					throw new FormatSchemaError("Pattern must be string @$propertyPath");
+				}
+				if (!preg_match('/' . $schema['pattern'] . '/', $body)) {
+					throw new FormatInputError("Property @$propertyPath does not match pattern '{$schema['pattern']}'");
+				}
+			}
+		}
 		if ($type === 'object') {
 			// Check that object contains all required
 			if (isset($schema['required'])) {
