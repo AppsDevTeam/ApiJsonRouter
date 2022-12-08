@@ -157,7 +157,7 @@ class ApiRouteFormat extends ApiRoute
 			}
 		}
 		// Check elements of an array
-		else if ($type === 'array') {
+		else if ($type === self::JSON_TYPE_ARRAY) {
 			$matches = 0;
 			foreach ($body as $key => $value) {
 				if (isset($schema['items'])) {
