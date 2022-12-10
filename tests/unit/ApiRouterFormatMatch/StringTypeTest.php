@@ -47,7 +47,7 @@ class StringTypeTest extends BaseUnit {
 
 		$appRequest = $route->match($request);
 		$this->assertRequestHasParamWithValue('error', 'INVALID_FORMAT', $appRequest);
-		$this->assertRequestHasParamWithValue('message', 'Property @body:login must be at least 50 characters long', $appRequest);
+		$this->assertRequestHasParamWithValue('message', '{"/login":["Minimum string length is 50, found 9"]}', $appRequest);
 	}
 
 	public function testMinLengthWrongSchema() {
@@ -68,7 +68,7 @@ class StringTypeTest extends BaseUnit {
 
 		$appRequest = $route->match($request);
 		$this->assertRequestHasParamWithValue('error', 'VERIFICATION_ERROR', $appRequest);
-		$this->assertRequestHasParamWithValue('message', 'MinLength must be integer @body:login', $appRequest);
+		$this->assertRequestHasParamWithValue('message', '{"/properties/login":["minLength must be a non-negative integer"]}', $appRequest);
 	}
 
 	public function testMaxLength() {
@@ -112,7 +112,7 @@ class StringTypeTest extends BaseUnit {
 
 		$appRequest = $route->match($request);
 		$this->assertRequestHasParamWithValue('error', 'INVALID_FORMAT', $appRequest);
-		$this->assertRequestHasParamWithValue('message', 'Property @body:login can be a maximum of 5 characters long', $appRequest);
+		$this->assertRequestHasParamWithValue('message', '{"/login":["Maximum string length is 5, found 9"]}', $appRequest);
 	}
 
 	public function testMaxLengthWrongSchema() {
@@ -133,7 +133,7 @@ class StringTypeTest extends BaseUnit {
 
 		$appRequest = $route->match($request);
 		$this->assertRequestHasParamWithValue('error', 'VERIFICATION_ERROR', $appRequest);
-		$this->assertRequestHasParamWithValue('message', 'MaxLength must be integer @body:login', $appRequest);
+		$this->assertRequestHasParamWithValue('message', '{"/properties/login":["maxLength must be a non-negative integer"]}', $appRequest);
 	}
 
 	public function testPattern() {
@@ -177,7 +177,7 @@ class StringTypeTest extends BaseUnit {
 
 		$appRequest = $route->match($request);
 		$this->assertRequestHasParamWithValue('error', 'INVALID_FORMAT', $appRequest);
-		$this->assertRequestHasParamWithValue('message', "Property @body:phone does not match pattern '^(\([0-9]{3}\))?[0-9]{3}-[0-9]{4}$'", $appRequest);
+		$this->assertRequestHasParamWithValue('message', '{"/phone":["The string should match pattern: ^(\\\\([0-9]{3}\\\\))?[0-9]{3}-[0-9]{4}$"]}', $appRequest);
 	}
 
 }

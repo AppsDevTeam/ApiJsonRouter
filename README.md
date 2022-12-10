@@ -2,6 +2,8 @@
 
 Creates a route that expects Json in request body, checks this body against Json schema supplied to the route and passes top level parameters to actions.
 
+[Opis JSON Schema](https://github.com/opis/json-schema) is used for full Json Schema standard validation.
+
 ## Examples
 
 ### Rotes without generating documentation
