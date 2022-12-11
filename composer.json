@@ -16,6 +16,13 @@
 	},
 	"require": {
 		"php": ">= 7.1.0",
-		"contributte/api-router": "^2.0"
+		"contributte/api-router": "^2.0",
+		"opis/json-schema": "^2.3"
+	},
+	"require-dev": {
+		"codeception/codeception": "^4.2",
+		"codeception/assert-throws": "^1.2",
+		"codeception/module-asserts": "^2.0",
+		"ext-json": "*"
 	}
 }
