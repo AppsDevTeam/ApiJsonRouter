@@ -2,6 +2,8 @@
 
 Creates a route that expects Json in request body, checks this body against Json schema supplied to the route and passes top level parameters to actions.
 
+ApiJsonRouter extends [Contributte Api-router](https://github.com/contributte/api-router) thus see the documentation for full routes definition.
+
 [Opis JSON Schema](https://github.com/opis/json-schema) is used for full Json Schema standard validation.
 
 ## Examples
@@ -12,16 +14,16 @@ Creates a route that expects Json in request body, checks this body against Json
 \ADT\ApiJsonRouter\ApiRouteFormat::setErrorPresenter('Error');
 \ADT\ApiJsonRouter\ApiRouteFormat::setErrorAction('handleError');
 $apiModule = new RouteList('Api');
-$apiModule[] = new ApiRouteFormat('/api/item', 'Item', [
+$apiModule[] = new ApiRouteFormat('/api/baskets/<id>/add-product', 'Basket', [
     '$schema' => 'https://json-schema.org/draft/2020-12/schema',
     'type' => 'object',
     'properties' => [
-        'name' => ['type' => 'string'],
+        'productId' => ['type' => 'number'],
         'count' => ['type' => 'number'],
     ],
-    'required' => ['name']
+    'required' => ['productId']
 ], [
-    'methods' => ['GET' => 'getItem']
+    'methods' => ['PATCH' => 'addProduct']
 ]);
 ```
 
@@ -42,22 +44,22 @@ $apiModule = new RouteList('Api');
 
 function getApiRouteSpecification() {
     return [
-        '/api/item>GET' => [
-            'path' => '/api/item',
-            'presenter' => 'Item',
-            'method' => 'GET',
-            'action' => 'getItem',
+        '/api/baskets>PATCH' => [
+            'path' => '/api/baskets/<id>/add-product',
+            'presenter' => 'Basket',
+            'method' => 'PATCH',
+            'action' => 'addProduct',
             'body' => [
                 '$schema' => 'https://json-schema.org/draft/2020-12/schema',
                 'type' => 'object',
                 'properties' => [
-                    'name' => ['type' => 'string'],
+                    'productId' => ['type' => 'number'],
                     'count' => ['type' => 'number'],
                 ],
-                'required' => ['name']
+                'required' => ['productId']
             ],
-            'title' => 'Get item',
-            'description' => 'Call to getting the item',
+            'title' => 'Add product into basket',
+            'description' => 'Add product into basket with specific count (default 1)',
         ],
     ];
 }
@@ -76,9 +78,13 @@ $htmlApiDocumentation = $parsedown->text($markdownApiDocumentation);
 
 ### Presenter
 ```php
-class ItemPresenter extends Presenter {
-    public function actionGetItem($_name, $_count = NULL) {
-        $this->sendJson(['name' => $_name]);
+class BasketPresenter extends Presenter {
+    public function actionAddProduct(int $id, int $_productId, int $_count = 1) {
+        // Add product into basket
+        // ...
+        
+        // Send response
+        $this->sendJson(['message' => 'Product was added']);
     }
 }
 ```
