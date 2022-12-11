@@ -10,7 +10,8 @@ use UnitTester;
 
 class BaseUnit extends Unit {
 
-	protected UnitTester $tester;
+	/** @var UnitTester */
+	protected $tester;
 
 	public static function getRoute(?array $body) {
 		return new ApiRouteFormat('/api/item', 'Item', $body, ['methods' => ['GET' => 'getItem']]);
@@ -23,14 +24,16 @@ class BaseUnit extends Unit {
 	}
 
 	protected function assertNotError($appRequest) {
-		if (isset($appRequest['error'])) {
-			$this->tester->assertArrayNotHasKey('error', $appRequest, 'JsonRouter error: ' . $appRequest['error'] . ' -> ' . $appRequest['message']);
+		$appParameters = $this->getAppRequestParameters($appRequest);
+		if (isset($appParameters['error'])) {
+			$this->tester->assertArrayNotHasKey('error', $appParameters, 'JsonRouter error: ' . $appParameters['error'] . ' -> ' . $appParameters['message']);
 		}
 	}
 
 	protected function assertJsonParametersCount($expectedCount, $appRequest) {
+		$appParameters = $this->getAppRequestParameters($appRequest);
 		$jsonBodyParamsCount = 0;
-		foreach ($appRequest as $param => $value) {
+		foreach ($appParameters as $param => $value) {
 			if ($param[0] == '_' && $param[1] != '_') {
 				$jsonBodyParamsCount++;
 			}
@@ -40,8 +43,16 @@ class BaseUnit extends Unit {
 	}
 
 	protected function assertRequestHasParamWithValue($expectedParamName, $expectedParamValue, $appRequest) {
-		$this->tester->assertArrayHasKey($expectedParamName, $appRequest);
-		$this->tester->assertEquals($expectedParamValue, $appRequest[$expectedParamName]);
+		$appParameters = $this->getAppRequestParameters($appRequest);
+		$this->tester->assertArrayHasKey($expectedParamName, $appParameters);
+		$this->tester->assertEquals($expectedParamValue, $appParameters[$expectedParamName]);
+	}
+
+	/**
+	 * This method is for better merging into branches with old Nette
+	 */
+	protected function getAppRequestParameters($appRequest) {
+		return $appRequest;
 	}
 
 }
