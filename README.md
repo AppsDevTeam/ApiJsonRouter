@@ -6,6 +6,8 @@ ApiJsonRouter extends [Contributte Api-router](https://github.com/contributte/ap
 
 [Opis JSON Schema](https://github.com/opis/json-schema) is used for full Json Schema standard validation.
 
+Standard "draft-2020-12" is used for validation as default.
+
 ## Examples
 
 ### Rotes without generating documentation
@@ -15,7 +17,6 @@ ApiJsonRouter extends [Contributte Api-router](https://github.com/contributte/ap
 \ADT\ApiJsonRouter\ApiRouteFormat::setErrorAction('handleError');
 $apiModule = new RouteList('Api');
 $apiModule[] = new ApiRouteFormat('/api/baskets/<id>/add-product', 'Basket', [
-    '$schema' => 'https://json-schema.org/draft/2020-12/schema',
     'type' => 'object',
     'properties' => [
         'productId' => ['type' => 'number'],
@@ -50,7 +51,6 @@ function getApiRouteSpecification() {
             'method' => 'PATCH',
             'action' => 'addProduct',
             'body' => [
-                '$schema' => 'https://json-schema.org/draft/2020-12/schema',
                 'type' => 'object',
                 'properties' => [
                     'productId' => ['type' => 'number'],

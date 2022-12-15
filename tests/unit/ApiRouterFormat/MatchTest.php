@@ -41,7 +41,6 @@ class MatchTest extends BaseUnit {
 
 	public function testBodyAgainstSchemaError() {
 		$route = $this->getRoute([
-			'$schema' => 'https://json-schema.org/draft/2020-12/schema',
 			'type' => 'object',
 			'properties' => [
 				'login' => [
@@ -62,7 +61,6 @@ class MatchTest extends BaseUnit {
 
 	public function testInvalidSchemeError() {
 		$route = $this->getRoute([
-			'$schema' => 'https://json-schema.org/draft/2020-12/schema',
 			'type' => 'object',
 			'properties' => [
 				'login' => [
@@ -102,7 +100,6 @@ class MatchTest extends BaseUnit {
 
 	public function testOtherError() {
 		$route = $this->getRoute([
-			'$schema' => 'https://json-schema.org/draft/2020-12/schema',
 			'$id' => 'https://example.com/schemas/address',
 			'type' => 'object',
 			'properties' => [
@@ -124,7 +121,6 @@ class MatchTest extends BaseUnit {
 
 	public function testSuccess() {
 		$route = $this->getRoute([
-			'$schema' => 'https://json-schema.org/draft/2020-12/schema',
 			'type' => 'object',
 			'properties' => [
 				'login' => [
