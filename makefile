@@ -15,6 +15,10 @@ init:
 	docker build -t api-json-router_php .
 	bin/composer install
 	$(CODECEPT) build
+	git config --local include.path ../.gitconfig
+
+checkout:
+	bin/composer install
 
 # spustí unit testy
 # ------------------------------------------------------------------------------
