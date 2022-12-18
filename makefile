@@ -21,6 +21,11 @@ init:
 test:
 	$(CODECEPT) run unit
 
+analyse:
+	vendor/bin/phpcs --standard=ruleset.xml --extensions=php --tab-width=4 -sp src tests
+
+analyse-fix:
+	vendor/bin/phpcbf --standard=ruleset.xml --extensions=php --tab-width=4 -sp src tests
 
 
 # Převeď všechny RUN_ARGS do formy:

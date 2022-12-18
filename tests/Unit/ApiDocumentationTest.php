@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Unit;
 
 use ADT\ApiJsonRouter\ApiDocumentation;
 
-class ApiDocumentationTest extends BaseUnit
+final class ApiDocumentationTest extends BaseUnit
 {
-	public function testGetDocumentation()
+	public function testGetDocumentation(): void
 	{
 		$apiDocumentation = new ApiDocumentation('Api', $this->getSpecification());
 

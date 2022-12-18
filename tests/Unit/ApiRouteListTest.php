@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Unit;
 
 use ADT\ApiJsonRouter\ApiRouteList;
 
-class ApiRouteListTest extends BaseUnit
+final class ApiRouteListTest extends BaseUnit
 {
-	public function testAddRoutesBySpecification()
+	public function testAddRoutesBySpecification(): void
 	{
 		$apiRouteList = new ApiRouteList('Api');
 		$apiRouteList->addRoutesBySpecification([
@@ -23,11 +25,11 @@ class ApiRouteListTest extends BaseUnit
 					'properties' => [
 						'type' => ['type' => 'string'],
 					],
-					'required' => ['type']
+					'required' => ['type'],
 				],
 				'title' => 'Create a request',
 				'description' => 'Create a request for a specific device.',
-			]
+			],
 		]);
 
 		$this->tester->assertIsArray(
