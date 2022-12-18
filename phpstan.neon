@@ -1,0 +1,9 @@
+parameters:
+	excludePaths:
+		analyse:
+			- tests/_output
+			- tests/_support
+	level: 5
+	paths:
+		- src
+		- tests
