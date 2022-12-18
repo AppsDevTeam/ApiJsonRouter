@@ -23,6 +23,7 @@ test:
 
 analyse:
 	vendor/bin/phpcs --standard=ruleset.xml --extensions=php --tab-width=4 --ignore=tests/_support -sp src tests
+	vendor/bin/phpstan analyse
 
 analyse-fix:
 	vendor/bin/phpcbf --standard=ruleset.xml --extensions=php --tab-width=4 --ignore=tests/_support -sp src tests
