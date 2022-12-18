@@ -42,7 +42,6 @@ class ApiRoute extends \Contributte\ApiRouter\ApiRoute
 			$result = $validator->validate($body, json_encode($schema));
 
 			if (!$result->isValid()) {
-				return "xxx";
 				$formatter = new ErrorFormatter();
 				$message = json_encode($formatter->format($result->error()), JSON_UNESCAPED_SLASHES);
 				throw new FormatInputException($message);
