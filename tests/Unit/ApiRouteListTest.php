@@ -18,17 +18,17 @@ class ApiRouteListTest extends BaseUnit
 				'parameters' => [
 					'uuid' => ['type' => 'string', 'requirement' => '.+'],
 				],
-             	'body' => [
+				'body' => [
 					'type' => 'object',
 					'properties' => [
 						'type' => ['type' => 'string'],
 					],
 					'required' => ['type']
 				],
-            	'title' => 'Create a request',
-            	'description' => 'Create a request for a specific device.',
+				'title' => 'Create a request',
+				'description' => 'Create a request for a specific device.',
 			]
-       	]);
+		]);
 
 		$this->tester->assertIsArray(
 			$apiRouteList->match(

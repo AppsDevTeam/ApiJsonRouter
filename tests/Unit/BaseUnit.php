@@ -24,10 +24,13 @@ class BaseUnit extends Unit
 	{
 		$url = new UrlScript('http://www.example.com' . $path, '/');
 		$bodyJson = json_encode($body);
-		return new Request($url, null, null, null, null, $method, null, null, function () use ($bodyJson) {return $bodyJson;});
+		return new Request($url, null, null, null, null, $method, null, null, function () use ($bodyJson) {
+			return $bodyJson;
+		});
 	}
 
-	protected function assertJsonParametersCount($expectedCount, $appRequest) {
+	protected function assertJsonParametersCount($expectedCount, $appRequest)
+	{
 		$appParameters = $this->getAppRequestParameters($appRequest);
 		$jsonBodyParamsCount = 0;
 		foreach ($appParameters as $param => $value) {
@@ -39,7 +42,8 @@ class BaseUnit extends Unit
 		$this->tester->assertEquals($expectedCount, $jsonBodyParamsCount);
 	}
 
-	protected function assertRequestHasParamWithValue($expectedParamName, $expectedParamValue, $appRequest) {
+	protected function assertRequestHasParamWithValue($expectedParamName, $expectedParamValue, $appRequest)
+	{
 		$appParameters = $this->getAppRequestParameters($appRequest);
 		$this->tester->assertArrayHasKey($expectedParamName, $appParameters);
 		$this->tester->assertEquals($expectedParamValue, $appParameters[$expectedParamName]);
@@ -48,7 +52,8 @@ class BaseUnit extends Unit
 	/**
 	 * This method is for better merging into branches with old Nette
 	 */
-	protected function getAppRequestParameters($appRequest) {
+	protected function getAppRequestParameters($appRequest)
+	{
 		return $appRequest;
 	}
 

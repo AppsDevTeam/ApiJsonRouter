@@ -18,7 +18,7 @@ class ApiRouteList extends RouteList
 		if ($match === null) {
 			throw new ClientException('The requested endpoint was not found.', 400);
 		}
-		
+
 		return $match;
 	}
 

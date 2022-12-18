@@ -17,7 +17,8 @@ class JsonStatusResponse implements Nette\Application\Response
 	/** @var int */
 	protected $code = 404;
 
-	public function __construct($payload, int $code) {
+	public function __construct($payload, int $code)
+	{
 		$this->payload = $payload;
 		$this->code = $code;
 	}
@@ -25,7 +26,8 @@ class JsonStatusResponse implements Nette\Application\Response
 	/**
 	 * Sends response to output with given status code.
 	 */
-	public function send(Nette\Http\IRequest $httpRequest, Nette\Http\IResponse $httpResponse): void {
+	public function send(Nette\Http\IRequest $httpRequest, Nette\Http\IResponse $httpResponse): void
+	{
 		$httpResponse->setContentType('application/json', 'utf-8');
 		$httpResponse->setCode($this->code);
 		echo Nette\Utils\Json::encode($this->payload);

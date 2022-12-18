@@ -2,11 +2,11 @@
 
 namespace ADT\ApiJsonRouter;
 
-class ApiDocumentation 
+class ApiDocumentation
 {
 	protected ?string $documentation = null;
 
-	private string $title;	
+	private string $title;
 
 	protected array $calls;
 
@@ -29,19 +29,19 @@ class ApiDocumentation
 	 * ]
 	 * @return $this
 	 */
-	public function addCall(array $call): self 
+	public function addCall(array $call): self
 	{
 		$this->calls[] = $call;
 		return $this;
 	}
 
-	public function createDocumentation(): void 
+	public function createDocumentation(): void
 	{
 		$this->documentation = '# ' . $this->title . "\n\n";
-		$first = TRUE;
+		$first = true;
 		foreach ($this->calls as $call) {
 			if ($first) {
-				$first = FALSE;
+				$first = false;
 			} else {
 				$this->documentation .= "\n\n";
 			}
@@ -50,15 +50,15 @@ class ApiDocumentation
 		$this->documentation .= "\n";
 	}
 
-	public function getDocumentation(bool $recreate = FALSE): string 
+	public function getDocumentation(bool $recreate = false): string
 	{
-		if ($recreate || $this->documentation === NULL) {
+		if ($recreate || $this->documentation === null) {
 			$this->createDocumentation();
 		}
 		return $this->documentation;
 	}
 
-	protected function documentCall(array $call) 
+	protected function documentCall(array $call)
 	{
 		$this->documentation .= '## ' . $call['title'] . "\n\n";
 		$this->documentation .= $call['description'] . "\n\n";
@@ -76,6 +76,5 @@ class ApiDocumentation
 		if (!empty($call['response'])) {
 			$this->documentation .= "\n\n**Response**:\n\n```json\n" . json_encode($call['response'], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n```";
 		}
-
 	}
 }

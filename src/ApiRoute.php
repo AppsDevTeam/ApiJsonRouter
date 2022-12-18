@@ -65,7 +65,7 @@ class ApiRoute extends \Contributte\ApiRouter\ApiRoute
 	{
 		$result = parent::match($httpRequest);
 
-		if ($result === NULL || $this->bodySchema === NULL) {
+		if ($result === null || $this->bodySchema === null) {
 			return $result;
 		}
 

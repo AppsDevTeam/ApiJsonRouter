@@ -24,26 +24,26 @@ final class RouterFactory
     // Prepare your route specification
     public static function getApiRouteSpecification(): array 
     {
-       return [
-          '/api/devices>POST' => [
-             'path' => '/api/devices/<uuid>/request',
-             'presenter' => 'DeviceRequest',
-             'method' => 'POST',
-             'action' => 'create',
-             'parameters' => [
-                'uuid' => ['type' => 'string'],
-             ],
-             'body' => [
-                'type' => 'object',
-                'properties' => [
-                    'type' => ['type' => 'string'],
-                ],
-                'required' => ['type']
-             ],
-             'title' => 'Create a request',
-             'description' => 'Create a request for a specific device.',
-          ]
-       ];
+		return [
+			'/api/devices>POST' => [
+				'path' => '/api/devices/<uuid>/request',
+				'presenter' => 'DeviceRequest',
+				'method' => 'POST',
+				'action' => 'create',
+				'parameters' => [
+					'uuid' => ['type' => 'string', 'requirement' => '.+'],
+				],
+				'body' => [
+					'type' => 'object',
+					'properties' => [
+						'type' => ['type' => 'string'],
+					],
+					'required' => ['type']
+				],
+				'title' => 'Create a request',
+				'description' => 'Create a request for a specific device.',
+		    ]
+	    ];
     }
 
     // Create API router

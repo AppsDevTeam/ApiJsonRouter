@@ -23,6 +23,12 @@
 	"require-dev": {
 		"codeception/codeception": "^4.2",
 		"codeception/assert-throws": "^1.2",
-		"codeception/module-asserts": "^2.0"
+		"codeception/module-asserts": "^2.0",
+		"slevomat/coding-standard": "^8.7"
+	},
+	"config": {
+		"allow-plugins": {
+			"dealerdirect/phpcodesniffer-composer-installer": true
+		}
 	}
 }
