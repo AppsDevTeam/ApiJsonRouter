@@ -1,14 +1,13 @@
 <?php
 
-namespace Unit\ApiRouterFormat;
+namespace Unit;
 
 use ADT\ApiJsonRouter\Exception\FormatInputException;
 use ADT\ApiJsonRouter\Exception\FormatSchemaException;
 use Nette\Http\Request;
 use Nette\Http\UrlScript;
-use Unit\BaseUnit;
 
-class MatchTest extends BaseUnit
+class ApiRouteTest extends BaseUnit
 {
 	public function testEmptySchema()
 	{
@@ -19,14 +18,10 @@ class MatchTest extends BaseUnit
 		]);
 
 		$appRequest = $route->match($request);
-		$this->assertNotError($appRequest);
+
 		$this->assertJsonParametersCount(0, $appRequest);
 	}
 
-	/**
-	 * @throws FormatInputException
-	 * @throws FormatSchemaException
-	 */
 	public function testInvalidBody()
 	{
 		$route = $this->getRoute([
@@ -42,8 +37,7 @@ class MatchTest extends BaseUnit
 		$bodyJson = 'wrong json body';
 		$request = new Request($url, null, null, null, null, 'GET', null, null, function () use ($bodyJson) {return $bodyJson;});
 
-		$appRequest = $route->match($request);
-		$this->assertRequestHasParamWithValue('message', 'Input data are not valid JSON', $appRequest);
+		$this->assertThrowsWithMessage(FormatInputException::class, 'Input data is not valid JSON.', function() use ($route, $request) { $route->match($request); });
 	}
 
 	public function testBodyAgainstSchemaError()
@@ -62,9 +56,7 @@ class MatchTest extends BaseUnit
 			'login' => 'freediver',
 		]);
 
-		$appRequest = $route->match($request);
-		$this->assertRequestHasParamWithValue('error', 'INVALID_FORMAT', $appRequest);
-		$this->assertRequestHasParamWithValue('message', '{"/login":["Minimum string length is 50, found 9"]}', $appRequest);
+		$this->assertThrowsWithMessage(FormatInputException::class, '{"/login":["Minimum string length is 50, found 9"]}', function() use ($route, $request) { $route->match($request); });
 	}
 
 	public function testInvalidSchemeError()
@@ -83,9 +75,7 @@ class MatchTest extends BaseUnit
 			'login' => 'freediver',
 		]);
 
-		$appRequest = $route->match($request);
-		$this->assertRequestHasParamWithValue('error', 'VERIFICATION_ERROR', $appRequest);
-		$this->assertRequestHasParamWithValue('message', '{"/properties/login":["minLength must be a non-negative integer"]}', $appRequest);
+		$this->assertThrowsWithMessage(FormatSchemaException::class, '{"/properties/login":["minLength must be a non-negative integer"]}', function() use ($route, $request) { $route->match($request); });
 	}
 
 	public function testUnresolvedError()
@@ -102,9 +92,7 @@ class MatchTest extends BaseUnit
 			'login' => 'freediver',
 		]);
 
-		$appRequest = $route->match($request);
-		$this->assertRequestHasParamWithValue('error', 'VERIFICATION_ERROR', $appRequest);
-		$this->assertRequestHasParamWithValue('message', '{"/":["Unresolved reference: http://example.com/user/schema.json"]}', $appRequest);
+		$this->assertThrowsWithMessage(FormatSchemaException::class, '{"/":["Unresolved reference: http://example.com/user/schema.json"]}', function() use ($route, $request) { $route->match($request); });
 	}
 
 
@@ -125,9 +113,7 @@ class MatchTest extends BaseUnit
 			'login' => 'freediver',
 		]);
 
-		$appRequest = $route->match($request);
-		$this->assertRequestHasParamWithValue('error', 'VERIFICATION_ERROR', $appRequest);
-		$this->assertRequestHasParamWithValue('message', '{"/":"Duplicate schema id: https://example.com/schemas/address#"}', $appRequest);
+		$this->assertThrowsWithMessage(FormatSchemaException::class, '{"/":"Duplicate schema id: https://example.com/schemas/address#"}', function() use ($route, $request) { $route->match($request); });
 	}
 
 	public function testSuccess()
@@ -147,10 +133,8 @@ class MatchTest extends BaseUnit
 		]);
 
 		$appRequest = $route->match($request);
-		$this->assertNotError($appRequest);
 
 		$this->assertJsonParametersCount(1, $appRequest);
 		$this->assertRequestHasParamWithValue('_login', 'freediver', $appRequest);
 	}
-
 }

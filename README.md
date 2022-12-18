@@ -2,98 +2,115 @@
 
 Creates a route that expects Json in request body, checks this body against Json schema supplied to the route and passes top level parameters to actions.
 
-ApiJsonRouter extends [Contributte Api-router](https://github.com/contributte/api-router) thus see the documentation for full routes definition.
+ApiJsonRouter extends [Contributte api-router](https://github.com/contributte/api-router) thus see the documentation for full routes definition.
 
 [Opis JSON Schema](https://github.com/opis/json-schema) is used for full Json Schema standard validation.
 
 Standard "draft-2020-12" is used for validation as default.
 
-## Examples
+## Installation
 
-### Rotes without generating documentation
-
-```php
-\ADT\ApiJsonRouter\ApiRouteFormat::setErrorPresenter('Error');
-\ADT\ApiJsonRouter\ApiRouteFormat::setErrorAction('handleError');
-$apiModule = new RouteList('Api');
-$apiModule[] = new ApiRouteFormat('/api/baskets/<id>/add-product', 'Basket', [
-    'type' => 'object',
-    'properties' => [
-        'productId' => ['type' => 'number'],
-        'count' => ['type' => 'number'],
-    ],
-    'required' => ['productId']
-], [
-    'methods' => ['PATCH' => 'addProduct']
-]);
+```bash
+composer require adt/api-json-router
 ```
 
-### With generating documentation
+## Example
+
+### Router
 
 ```php
-// Configure to redirect errors into error presenter
-\ADT\ApiJsonRouter\ApiRouteFormat::setErrorPresenter('Error');
-\ADT\ApiJsonRouter\ApiRouteFormat::setErrorAction('handleError');
-\ADT\ApiJsonRouter\ApiRouteFormat::setThrowErrors(FALSE);
-$apiModule = new RouteList('Api');
-
-// Or to throw \ADT\ApiJsonRouter\FormatSchemaError or \ADT\ApiJsonRouter\FormatInputError
-\ADT\ApiJsonRouter\ApiRouteFormat::setThrowErrors(TRUE);
-$apiModule = new RouteList('Api');
-
-\ADT\ApiJsonRouter\ApiRouteFormat::addRoutesBySpecification($apiModule, getApiRouteSpecification());
-
-function getApiRouteSpecification() {
-    return [
-        '/api/baskets>PATCH' => [
-            'path' => '/api/baskets/<id>/add-product',
-            'presenter' => 'Basket',
-            'method' => 'PATCH',
-            'action' => 'addProduct',
-            'body' => [
+final class RouterFactory
+{
+    // Prepare your route specification
+    public static function getApiRouteSpecification(): array 
+    {
+       return [
+          '/api/devices>POST' => [
+             'path' => '/api/devices/<uuid>/request',
+             'presenter' => 'DeviceRequest',
+             'method' => 'POST',
+             'action' => 'create',
+             'parameters' => [
+                'uuid' => ['type' => 'string'],
+             ],
+             'body' => [
                 'type' => 'object',
                 'properties' => [
-                    'productId' => ['type' => 'number'],
-                    'count' => ['type' => 'number'],
+                    'type' => ['type' => 'string'],
                 ],
-                'required' => ['productId']
-            ],
-            'title' => 'Add product into basket',
-            'description' => 'Add product into basket with specific count (default 1)',
-        ],
-    ];
+                'required' => ['type']
+             ],
+             'title' => 'Create a request',
+             'description' => 'Create a request for a specific device.',
+          ]
+       ];
+    }
+
+    // Create API router
+    public static function createRouter(): \ADT\ApiJsonRouter\ApiRouteList
+    {
+        $apiRouter = new \ADT\ApiJsonRouter\ApiRouteList('Api');
+        $apiRouter->addRoutesBySpecification(self::getApiRouteSpecification());
+        return $apiRouter;
+    }
 }
-
-// to generate API documentation in Markdown format
-$apiSpecification = getApiRouteSpecification();
-$apiDocumentation = new \ADT\ApiJsonRouter\ApiDocumentation($apiSpecification);
-$apiDocumentation->setTitleLevel(1); // for set another level of generated titles, default 2
-$markdownApiDocumentation = $apiDocumentation->getDocumentation();
-
-// e.g. you can use https://github.com/erusev/parsedown
-$parsedown = new \Parsedown();
-$htmlApiDocumentation = $parsedown->text($markdownApiDocumentation);
 ```
 
+### DeviceRequest presenter
 
-### Presenter
 ```php
-class BasketPresenter extends Presenter {
-    public function actionAddProduct(int $id, int $_productId, int $_count = 1) {
-        // Add product into basket
-        // ...
+class DeviceRequestPresenter extends Presenter 
+{
+    public function actionCreate(string $uuid, string $_type) 
+    {
+        // Check if you have access to a specific device
+        if ($this->deviceQuery->create()->byUuid($uuid)) {
+            $this->sendJsonError(404);
+        }
+    
+        // Create a device request
+        $deviceRequest = new DeviceRequest($device, $_type)
+        $this->em->persist();
+        $this->em->flush();
         
-        // Send response
-        $this->sendJson(['message' => 'Product was added']);
+        // Send a response
+        $this->sendJson(['uuid' => $deviceRequest->getUuid(), 'type' => $device->getType()]);
     }
+}
+```
+
+### Docs presenter
+
+```php
+class DocsPresenter extends Presenter
+{
+	public function actionDefault()
+	{
+		// Generate API documentation in Markdown format
+		$apiDocumentation = new ADT\ApiJsonRouter\ApiDocumentation('API Docs', RouterFactory::getApiRouteSpecification());
+		$markdownApiDocumentation = $apiDocumentation->getDocumentation();
+
+		// Generate API documentation in HTML format
+		// e.g. you can use https://github.com/erusev/parsedown
+		die((new \Parsedown())->text($markdownApiDocumentation));
+	}
 }
 ```
 
 ### Error presenter
+
 ```php
-class ErrorPresenter extends Presenter {
-    public function actionHandleError($error, int $code, $message) {
-        $this->sendResponse(new JsonStatusResponse(['error' => $error, 'message' => $message], $code));
-    }
+class ErrorPresenter extends Presenter
+{
+	public function renderDefault(Exception $exception)
+	{
+		if ($exception instanceof ApiException) {
+		    $this->sendJsonError($exception->getCode(), $exception->getMessage());
+		}
+
+		Debugger::log($exception, ILogger::EXCEPTION);
+
+		$this->sendJsonError(500, 'There was an error processing your request. Please try again later.');
+	}
 }
 ```

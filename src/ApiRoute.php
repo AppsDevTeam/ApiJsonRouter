@@ -7,8 +7,8 @@ use ADT\ApiJsonRouter\Exception\FormatInputException;
 use ADT\ApiJsonRouter\Exception\FormatSchemaException;
 use Nette;
 use Opis\JsonSchema\Errors\ErrorFormatter;
+use Opis\JsonSchema\Exceptions\DuplicateSchemaIdException;
 use Opis\JsonSchema\Exceptions\ParseException;
-use Opis\JsonSchema\Exceptions\SchemaException;
 use Opis\JsonSchema\Exceptions\UnresolvedException;
 use Opis\JsonSchema\JsonPointer;
 use Opis\JsonSchema\Validator;
@@ -33,30 +33,28 @@ class ApiRoute extends \Contributte\ApiRouter\ApiRoute
 	 * @throws FormatInputException
 	 * @throws FormatSchemaException
 	 */
-	protected function verifyBodyFormat($body, $schema)
+	protected function verifyBodyFormat($body, $schema): void
 	{
 		$validator = new Validator();
 		$validator->resolver()->registerRaw(json_encode($schema));
 
-		$schemaErrorMessage = null;
 		try {
-			$result = $validator->validate($body, json_encode($schema));
+			if (!$result = $validator->validate($body, json_encode($schema))) {
+				$formatter = new ErrorFormatter();
+				$message = json_encode($formatter->format($result->error()), JSON_UNESCAPED_SLASHES);
+				throw new FormatInputException($message);
+			}
+
+			return;
 		} catch (ParseException $e) {
 			$schemaErrorMessage = [JsonPointer::pathToString($e->schemaInfo()->path()) => [$e->getMessage()]];
 		} catch (UnresolvedException $e) {
 			$schemaErrorMessage = [JsonPointer::pathToString($e->getSchema()->info()->path()) => [$e->getMessage()]];
-		} catch (SchemaException $e) {
+		} catch (DuplicateSchemaIdException $e) {
 			$schemaErrorMessage = ['/' => $e->getMessage()];
 		}
-		if ($schemaErrorMessage) {
-			throw new FormatSchemaException(json_encode($schemaErrorMessage, JSON_UNESCAPED_SLASHES));
-		}
 
-		if (!$result->isValid()) {
-			$formatter = new ErrorFormatter();
-			$message = json_encode($formatter->format($result->error()), JSON_UNESCAPED_SLASHES);
-			throw new FormatInputException($message);
-		}
+		throw new FormatSchemaException(json_encode($schemaErrorMessage, JSON_UNESCAPED_SLASHES));
 	}
 
 	/**

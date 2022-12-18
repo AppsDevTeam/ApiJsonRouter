@@ -3,6 +3,7 @@
 namespace Unit;
 
 use ADT\ApiJsonRouter\ApiRoute;
+use Codeception\AssertThrows;
 use Codeception\Test\Unit;
 use Nette\Http\Request;
 use Nette\Http\UrlScript;
@@ -10,6 +11,8 @@ use UnitTester;
 
 class BaseUnit extends Unit
 {
+	use AssertThrows;
+
 	protected UnitTester $tester;
 
 	public static function getRoute(?array $body)
@@ -17,18 +20,11 @@ class BaseUnit extends Unit
 		return new ApiRoute('/api/item', 'Item', ['methods' => ['GET' => 'getItem']], $body);
 	}
 
-	public static function getRequest(?array $body)
+	public static function getRequest(?array $body, string $path = '/api/item', string $method = 'GET')
 	{
-		$url = new UrlScript('http://www.example.com/api/item', '/');
+		$url = new UrlScript('http://www.example.com' . $path, '/');
 		$bodyJson = json_encode($body);
-		return new Request($url, null, null, null, null, 'GET', null, null, function () use ($bodyJson) {return $bodyJson;});
-	}
-
-	protected function assertNotError($appRequest) {
-		$appParameters = $this->getAppRequestParameters($appRequest);
-		if (isset($appParameters['error'])) {
-			$this->tester->assertArrayNotHasKey('error', $appParameters, 'JsonRouter error: ' . $appParameters['error'] . ' -> ' . $appParameters['message']);
-		}
+		return new Request($url, null, null, null, null, $method, null, null, function () use ($bodyJson) {return $bodyJson;});
 	}
 
 	protected function assertJsonParametersCount($expectedCount, $appRequest) {
@@ -56,4 +52,27 @@ class BaseUnit extends Unit
 		return $appRequest;
 	}
 
+	protected function getSpecification(): array
+	{
+		return [
+			'/api/devices>POST' => [
+				'path' => '/api/devices/<uuid>/request',
+				'presenter' => 'DeviceRequest',
+				'method' => 'POST',
+				'action' => 'create',
+				'parameters' => [
+					'uuid' => ['type' => 'string', 'requirement' => '.+'],
+				],
+				'body' => [
+					'type' => 'object',
+					'properties' => [
+						'type' => ['type' => 'string'],
+					],
+					'required' => ['type']
+				],
+				'title' => 'Create a request',
+				'description' => 'Create a request for a specific device.',
+			]
+		];
+	}
 }
