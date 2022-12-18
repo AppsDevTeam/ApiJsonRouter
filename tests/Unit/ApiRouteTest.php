@@ -35,13 +35,17 @@ class ApiRouteTest extends BaseUnit
 
 		$url = new UrlScript('http://www.example.com/api/item', '/');
 		$bodyJson = 'wrong json body';
-		$request = new Request($url, null, null, null, null, 'GET', null, null, function () use ($bodyJson) {
+		$request = new Request($url, method: 'GET', rawBodyCallback: function () use ($bodyJson) {
 			return $bodyJson;
 		});
 
-		$this->assertThrowsWithMessage(FormatInputException::class, 'Input data is not valid JSON.', function () use ($route, $request) {
-			$route->match($request);
-		});
+		$this->assertThrowsWithMessage(
+			FormatInputException::class,
+			'Input data is not valid JSON.',
+			function () use ($route, $request) {
+				$route->match($request);
+			}
+		);
 	}
 
 	public function testBodyAgainstSchemaError()
@@ -60,9 +64,13 @@ class ApiRouteTest extends BaseUnit
 			'login' => 'freediver',
 		]);
 
-		$this->assertThrowsWithMessage(FormatInputException::class, '{"/login":["Minimum string length is 50, found 9"]}', function () use ($route, $request) {
-			$route->match($request);
-		});
+		$this->assertThrowsWithMessage(
+			FormatInputException::class,
+			'{"/login":["Minimum string length is 50, found 9"]}',
+			function () use ($route, $request) {
+				$route->match($request);
+			}
+		);
 	}
 
 	public function testInvalidSchemeError()
@@ -81,9 +89,13 @@ class ApiRouteTest extends BaseUnit
 			'login' => 'freediver',
 		]);
 
-		$this->assertThrowsWithMessage(FormatSchemaException::class, '{"/properties/login":["minLength must be a non-negative integer"]}', function () use ($route, $request) {
-			$route->match($request);
-		});
+		$this->assertThrowsWithMessage(
+			FormatSchemaException::class,
+			'{"/properties/login":["minLength must be a non-negative integer"]}',
+			function () use ($route, $request) {
+				$route->match($request);
+			}
+		);
 	}
 
 	public function testUnresolvedError()
@@ -100,9 +112,13 @@ class ApiRouteTest extends BaseUnit
 			'login' => 'freediver',
 		]);
 
-		$this->assertThrowsWithMessage(FormatSchemaException::class, '{"/":["Unresolved reference: http://example.com/user/schema.json"]}', function () use ($route, $request) {
-			$route->match($request);
-		});
+		$this->assertThrowsWithMessage(
+			FormatSchemaException::class,
+			'{"/":["Unresolved reference: http://example.com/user/schema.json"]}',
+			function () use ($route, $request) {
+				$route->match($request);
+			}
+		);
 	}
 
 
@@ -123,9 +139,13 @@ class ApiRouteTest extends BaseUnit
 			'login' => 'freediver',
 		]);
 
-		$this->assertThrowsWithMessage(FormatSchemaException::class, '{"/":"Duplicate schema id: https://example.com/schemas/address#"}', function () use ($route, $request) {
-			$route->match($request);
-		});
+		$this->assertThrowsWithMessage(
+			FormatSchemaException::class,
+			'{"/":"Duplicate schema id: https://example.com/schemas/address#"}',
+			function () use ($route, $request) {
+				$route->match($request);
+			}
+		);
 	}
 
 	public function testSuccess()

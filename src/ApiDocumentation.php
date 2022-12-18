@@ -66,15 +66,21 @@ class ApiDocumentation
 		$this->documentation .= "**Method**: " . $call['method'];
 
 		if (!empty($call['parameters'])) {
-			$this->documentation .= "\n\n**Parameters**:\n\n```json\n" . json_encode($call['parameters'], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n```";
+			$this->documentation .= "\n\n**Parameters**:\n\n```json\n"
+				. json_encode($call['parameters'], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
+				. "\n```";
 		}
 
 		if (!empty($call['body'])) {
-			$this->documentation .= "\n\n**Body**:\n\n```json\n" . json_encode($call['body'], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n```";
+			$this->documentation .= "\n\n**Body**:\n\n```json\n"
+				. json_encode($call['body'], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
+				. "\n```";
 		}
 
 		if (!empty($call['response'])) {
-			$this->documentation .= "\n\n**Response**:\n\n```json\n" . json_encode($call['response'], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n```";
+			$this->documentation .= "\n\n**Response**:\n\n```json\n"
+				. json_encode($call['response'], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
+				. "\n```";
 		}
 	}
 }

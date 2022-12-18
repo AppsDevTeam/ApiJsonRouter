@@ -33,7 +33,7 @@ class ApiRoute extends \Contributte\ApiRouter\ApiRoute
 	 * @throws FormatInputException
 	 * @throws FormatSchemaException
 	 */
-	protected function verifyBodyFormat($body, $schema): void
+	protected function verifyBodyFormat($body, array $schema): void
 	{
 		$validator = new Validator();
 		$validator->resolver()->registerRaw(json_encode($schema));
@@ -96,7 +96,10 @@ class ApiRoute extends \Contributte\ApiRouter\ApiRoute
 	public function resolveMethod(Nette\Http\IRequest $request): string
 	{
 		if (!in_array($request->getMethod(), $this->getMethods(), true)) {
-			throw new ClientException('Allowed methods: ' . implode(', ', $this->getMethods()) . '.', Nette\Http\IResponse::S405_MethodNotAllowed);
+			throw new ClientException(
+				'Allowed methods: ' . implode(', ', $this->getMethods()) . '.',
+				Nette\Http\IResponse::S405_MethodNotAllowed
+			);
 		}
 
 		return $request->getMethod();

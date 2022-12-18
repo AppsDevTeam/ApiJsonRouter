@@ -11,7 +11,7 @@
             <property name="tabIndent" value="true"/>
         </properties>
     </rule>
-    <rule ref="vendor/slevomat/coding-standard/SlevomatCodingStandard/ruleset.xml">
-        <rule ref="Generic.Files.LineLength.TooLong"/>
-    </rule>
+<!--    <rule ref="vendor/slevomat/coding-standard/SlevomatCodingStandard/ruleset.xml">-->
+<!--        <rule ref="Generic.Files.LineLength.TooLong"/>-->
+<!--    </rule>-->
 </ruleset>
