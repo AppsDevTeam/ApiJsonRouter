@@ -39,7 +39,9 @@ class ApiRoute extends \Contributte\ApiRouter\ApiRoute
 		$validator->resolver()->registerRaw(json_encode($schema));
 
 		try {
-			if (!$result = $validator->validate($body, json_encode($schema))) {
+			$result = $validator->validate($body, json_encode($schema));
+
+			if (!$result->isValid()) {
 				$formatter = new ErrorFormatter();
 				$message = json_encode($formatter->format($result->error()), JSON_UNESCAPED_SLASHES);
 				throw new FormatInputException($message);
