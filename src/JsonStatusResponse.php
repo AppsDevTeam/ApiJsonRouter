@@ -3,14 +3,13 @@
 namespace ADT\ApiJsonRouter;
 
 use Nette;
-use Nette\Application\IResponse;
 
 /**
  * Class JsonErrorResponse
  * @package App\Model\Routing
  * Nastaví status kód a přidá do těla daný payload (především s popisem chyby, která nastala)
  */
-class JsonStatusResponse implements IResponse
+class JsonStatusResponse implements Nette\Application\Response
 {
 	/** @var mixed */
 	protected $payload;

@@ -2,13 +2,16 @@
 
 namespace Unit\ApiRouterFormat;
 
+use ADT\ApiJsonRouter\Exception\FormatInputException;
+use ADT\ApiJsonRouter\Exception\FormatSchemaException;
 use Nette\Http\Request;
 use Nette\Http\UrlScript;
 use Unit\BaseUnit;
 
-class MatchTest extends BaseUnit {
-
-	public function testEmptySchema() {
+class MatchTest extends BaseUnit
+{
+	public function testEmptySchema()
+	{
 		$route = $this->getRoute(null);
 
 		$request = $this->getRequest([
@@ -20,7 +23,12 @@ class MatchTest extends BaseUnit {
 		$this->assertJsonParametersCount(0, $appRequest);
 	}
 
-	public function testInvalidBody() {
+	/**
+	 * @throws FormatInputException
+	 * @throws FormatSchemaException
+	 */
+	public function testInvalidBody()
+	{
 		$route = $this->getRoute([
 			'type' => 'object',
 			'properties' => [
@@ -35,11 +43,11 @@ class MatchTest extends BaseUnit {
 		$request = new Request($url, null, null, null, null, 'GET', null, null, function () use ($bodyJson) {return $bodyJson;});
 
 		$appRequest = $route->match($request);
-		$this->assertRequestHasParamWithValue('error', 'INVALID_FORMAT', $appRequest);
 		$this->assertRequestHasParamWithValue('message', 'Input data are not valid JSON', $appRequest);
 	}
 
-	public function testBodyAgainstSchemaError() {
+	public function testBodyAgainstSchemaError()
+	{
 		$route = $this->getRoute([
 			'type' => 'object',
 			'properties' => [
@@ -59,7 +67,8 @@ class MatchTest extends BaseUnit {
 		$this->assertRequestHasParamWithValue('message', '{"/login":["Minimum string length is 50, found 9"]}', $appRequest);
 	}
 
-	public function testInvalidSchemeError() {
+	public function testInvalidSchemeError()
+	{
 		$route = $this->getRoute([
 			'type' => 'object',
 			'properties' => [
@@ -79,7 +88,8 @@ class MatchTest extends BaseUnit {
 		$this->assertRequestHasParamWithValue('message', '{"/properties/login":["minLength must be a non-negative integer"]}', $appRequest);
 	}
 
-	public function testUnresolvedError() {
+	public function testUnresolvedError()
+	{
 		$route = $this->getRoute([
 			'$ref' => 'http://example.com/{folder}/{file}.json',
 			'$vars' => [
@@ -98,7 +108,8 @@ class MatchTest extends BaseUnit {
 	}
 
 
-	public function testOtherError() {
+	public function testOtherError()
+	{
 		$route = $this->getRoute([
 			'$id' => 'https://example.com/schemas/address',
 			'type' => 'object',
@@ -119,7 +130,8 @@ class MatchTest extends BaseUnit {
 		$this->assertRequestHasParamWithValue('message', '{"/":"Duplicate schema id: https://example.com/schemas/address#"}', $appRequest);
 	}
 
-	public function testSuccess() {
+	public function testSuccess()
+	{
 		$route = $this->getRoute([
 			'type' => 'object',
 			'properties' => [

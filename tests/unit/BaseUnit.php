@@ -2,22 +2,23 @@
 
 namespace Unit;
 
-use ADT\ApiJsonRouter\ApiRouteFormat;
+use ADT\ApiJsonRouter\ApiRoute;
 use Codeception\Test\Unit;
 use Nette\Http\Request;
 use Nette\Http\UrlScript;
 use UnitTester;
 
-class BaseUnit extends Unit {
+class BaseUnit extends Unit
+{
+	protected UnitTester $tester;
 
-	/** @var UnitTester */
-	protected $tester;
-
-	public static function getRoute(?array $body) {
-		return new ApiRouteFormat('/api/item', 'Item', $body, ['methods' => ['GET' => 'getItem']]);
+	public static function getRoute(?array $body)
+	{
+		return new ApiRoute('/api/item', 'Item', ['methods' => ['GET' => 'getItem']], $body);
 	}
 
-	public static function getRequest(?array $body) {
+	public static function getRequest(?array $body)
+	{
 		$url = new UrlScript('http://www.example.com/api/item', '/');
 		$bodyJson = json_encode($body);
 		return new Request($url, null, null, null, null, 'GET', null, null, function () use ($bodyJson) {return $bodyJson;});
