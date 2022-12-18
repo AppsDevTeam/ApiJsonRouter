@@ -23,7 +23,7 @@ class ApiRoute extends \Contributte\ApiRouter\ApiRoute
 	 * @param array $data See parent constructor
 	 * @param ?array $bodySchema JSON schema as returned when parsed by json_decode
 	 */
-	public function __construct($path, string $presenter, array $data, ?array $bodySchema = null)
+	public function __construct(array|string $path, string $presenter, array $data, ?array $bodySchema = null)
 	{
 		parent::__construct($path, $presenter, $data);
 		$this->bodySchema = $bodySchema;

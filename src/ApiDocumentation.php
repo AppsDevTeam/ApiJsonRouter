@@ -58,7 +58,7 @@ class ApiDocumentation
 		return $this->documentation;
 	}
 
-	protected function documentCall(array $call)
+	protected function documentCall(array $call): void
 	{
 		$this->documentation .= '## ' . $call['title'] . "\n\n";
 		$this->documentation .= $call['description'] . "\n\n";
