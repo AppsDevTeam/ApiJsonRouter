@@ -2,26 +2,20 @@
 
 namespace ADT\ApiJsonRouter;
 
-class ApiDocumentation {
+class ApiDocumentation
+{
+	protected ?string $documentation = null;
 
-	/** @var string|null */
-	protected $documentation = NULL;
+	private string $title;
 
-	/** @var array */
-	protected $calls = [];
+	protected array $calls;
 
-	/** @var int */
-	private $titleLevel = 2;
-
-	public function __construct(?array $calls) {
+	public function __construct(string $title, array $calls)
+	{
+		$this->title = $title;
 		foreach ($calls as $call) {
 			$this->addCall($call);
 		}
-	}
-
-	public function setTitleLevel(int $titleLevel): self {
-		$this->titleLevel = $titleLevel;
-		return $this;
 	}
 
 	/**
@@ -35,37 +29,19 @@ class ApiDocumentation {
 	 * ]
 	 * @return $this
 	 */
-	public function addCall(array $call): self {
+	public function addCall(array $call): self
+	{
 		$this->calls[] = $call;
 		return $this;
 	}
 
-	protected function documentCall($call) {
-		$this->documentation .= str_repeat('#', $this->titleLevel) . ' ' . $call['title'] . "\n\n";
-		$this->documentation .= $call['description'] . "\n\n";
-		$this->documentation .= "**URL**: `" . $call['path'] . "`\n\n";
-		$this->documentation .= "**Method**: " . $call['method'];
-
-		if (isset($call['query'])) {
-			$this->documentation .= "\n\n**Query**:\n\n```json\n" . json_encode($call['query'], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n```";
-		}
-
-		if ($call['body'] !== NULL) {
-			$this->documentation .= "\n\n**Body**:\n\n```json\n" . json_encode($call['body'], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n```";
-		}
-
-		if (isset($call['response'])) {
-			$this->documentation .= "\n\n**Response**:\n\n```json\n" . json_encode($call['response'], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n```";
-		}
-
-	}
-
-	public function createDocumentation(): void {
-		$this->documentation = '';
-		$first = TRUE;
+	public function createDocumentation(): void
+	{
+		$this->documentation = '# ' . $this->title . "\n\n";
+		$first = true;
 		foreach ($this->calls as $call) {
 			if ($first) {
-				$first = FALSE;
+				$first = false;
 			} else {
 				$this->documentation .= "\n\n";
 			}
@@ -74,10 +50,37 @@ class ApiDocumentation {
 		$this->documentation .= "\n";
 	}
 
-	public function getDocumentation($recreate = FALSE): string {
-		if ($recreate || $this->documentation === NULL) {
+	public function getDocumentation(bool $recreate = false): string
+	{
+		if ($recreate || $this->documentation === null) {
 			$this->createDocumentation();
 		}
 		return $this->documentation;
+	}
+
+	protected function documentCall(array $call): void
+	{
+		$this->documentation .= '## ' . $call['title'] . "\n\n";
+		$this->documentation .= $call['description'] . "\n\n";
+		$this->documentation .= "**URL**: `" . $call['path'] . "`\n\n";
+		$this->documentation .= "**Method**: " . $call['method'];
+
+		if (!empty($call['parameters'])) {
+			$this->documentation .= "\n\n**Parameters**:\n\n```json\n"
+				. json_encode($call['parameters'], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
+				. "\n```";
+		}
+
+		if (!empty($call['body'])) {
+			$this->documentation .= "\n\n**Body**:\n\n```json\n"
+				. json_encode($call['body'], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
+				. "\n```";
+		}
+
+		if (!empty($call['response'])) {
+			$this->documentation .= "\n\n**Response**:\n\n```json\n"
+				. json_encode($call['response'], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
+				. "\n```";
+		}
 	}
 }

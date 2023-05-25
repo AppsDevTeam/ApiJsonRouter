@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-docker run --rm -it -u $(id -u) -v $PWD:/var/www/html -w /var/www/html api-json-router_php php "$@"
+docker run --rm -i -u $(id -u) -v $PWD:/var/www/html -w /var/www/html api-json-router_php php "$@"

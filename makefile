@@ -15,12 +15,26 @@ init:
 	docker build -t api-json-router_php .
 	bin/composer install
 	$(CODECEPT) build
+	git config --local include.path ../.gitconfig
+
+checkout:
+	bin/composer install
 
 # spustí unit testy
 # ------------------------------------------------------------------------------
 test:
 	$(CODECEPT) run unit
 
+analyse: analyse-cs analyse-phpstan
+
+analyse-cs:
+	vendor/bin/phpcs --standard=ruleset.xml --extensions=php --tab-width=4 --ignore=tests/_support -sp src tests
+
+analyse-phpstan:
+	vendor/bin/phpstan analyse
+
+analyse-fix:
+	vendor/bin/phpcbf --standard=ruleset.xml --extensions=php --tab-width=4 --ignore=tests/_support -sp src tests
 
 
 # Převeď všechny RUN_ARGS do formy:
