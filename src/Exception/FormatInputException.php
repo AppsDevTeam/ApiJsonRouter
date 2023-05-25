@@ -11,6 +11,6 @@ class FormatInputException extends Exception implements ApiJsonRouterException
 {
 	public function __construct(string $message)
 	{
-		parent::__construct($message, IResponse::S404_NotFound);
+		parent::__construct($message, IResponse::S400_BadRequest);
 	}
 }

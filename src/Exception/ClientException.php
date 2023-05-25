@@ -8,8 +8,17 @@ use Exception;
 
 class ClientException extends Exception implements ApiJsonRouterException
 {
-	public function __construct(string $message, int $code)
+	private ?int $errorCode = null;
+
+	public function __construct(string $message, int $httpCode, ?int $errorCode = null, $previous = null)
 	{
-		parent::__construct($message, $code);
+		parent::__construct($message, $httpCode, $previous);
+
+		$this->errorCode = $errorCode;
+	}
+
+	public function getErrorCode(): ?int
+	{
+		return $this->errorCode;
 	}
 }
