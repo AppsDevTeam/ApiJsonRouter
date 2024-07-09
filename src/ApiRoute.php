@@ -113,7 +113,7 @@ class ApiRoute extends \Contributte\ApiRouter\ApiRoute
 	{
 		if (!in_array($request->getMethod(), $this->getMethods(), true)) {
 			throw new ClientException(
-				'Allowed methods: ' . implode(', ', $this->getMethods()) . '.',
+				'Allowed methods: ' . implode(', ', $this->getMethods()) . '. Used method: ' . $request->getMethod() . '.',
 				Nette\Http\IResponse::S405_MethodNotAllowed
 			);
 		}
