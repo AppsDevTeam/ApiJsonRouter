@@ -63,7 +63,7 @@ class ApiDocumentation
 		$this->documentation .= '## ' . $call['title'] . "\n\n";
 		$this->documentation .= $call['description'] . "\n\n";
 		$this->documentation .= "**URL**: `" . $call['path'] . "`\n\n";
-		$this->documentation .= "**Method**: " . $call['method'];
+		$this->documentation .= "**Method**: " . implode('|', (array) $call['method']);
 
 		if (!empty($call['parameters'])) {
 			$this->documentation .= "\n\n**Parameters**:\n\n```json\n"
