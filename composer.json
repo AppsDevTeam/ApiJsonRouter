@@ -17,7 +17,7 @@
 	"require": {
 		"php": ">=8.0",
 		"ext-json": "*",
-		"contributte/api-router": "^4.0|^5.0|^6.0",
+		"contributte/api-router": "^7.0",
 		"opis/json-schema": "^2.3"
 	},
 	"require-dev": {
