@@ -25,7 +25,21 @@ class ApiRoute extends \Contributte\ApiRouter\ApiRoute
 	 */
 	public function __construct(array|string $path, string $presenter, array $data, ?array $bodySchema = null)
 	{
-		parent::__construct($path, $presenter, $data);
+		parent::__construct(
+			path: $path,
+			presenter: $presenter,
+			parameters: $data['parameters'] ?? [],
+			methods: $data['methods'] ?? [],
+			description: $data['description'] ?? null,
+			method: $data['method'] ?? null,
+			priority: $data['priority'] ?? 0,
+			format: $data['format'] ?? 'json',
+			example: $data['example'] ?? null,
+			section: $data['section'] ?? null,
+			tags: $data['tags'] ?? [],
+			response_codes: $data['response_codes'] ?? [],
+			disable: $data['disable'] ?? false,
+		);
 		$this->bodySchema = $bodySchema;
 	}
 
