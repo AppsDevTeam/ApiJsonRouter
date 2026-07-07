@@ -31,10 +31,10 @@ class ApiRouteList extends RouteList
 					: [ $route['method'] ];
 			}
 
-			$this[] = new ApiRoute($route['path'], $route['presenter'], [
+			$this->add(new ApiRoute($route['path'], $route['presenter'], [
 				'methods' => $methods,
 				'parameters' => $route['parameters'][$this->getMethod()] ?? $route['parameters'] ?? [],
-			], $route['body'][$this->getMethod()] ?? $route['body'] ?? null);
+			], $route['body'][$this->getMethod()] ?? $route['body'] ?? null));
 		}
 
 		return $this;
